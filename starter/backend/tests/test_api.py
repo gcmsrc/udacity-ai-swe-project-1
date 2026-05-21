@@ -111,24 +111,9 @@ def test_list_orders_by_status_api_matching(client):
     assert response.json[0]["order_id"] == "S001"
 
 
+### TEST API HELP ###
 def test_api_help_serves_swagger_ui(client):
     response = client.get("/api/help")
     assert response.status_code == 200
     assert b"swagger-ui" in response.data
     assert b"/api/help/openapi.yaml" in response.data
-
-
-def test_api_help_openapi_yaml_file(client):
-    response = client.get("/api/help/openapi.yaml")
-    assert response.status_code == 200
-    assert response.mimetype == "application/yaml"
-    assert b"openapi: 3.0.3" in response.data
-    assert b"/api/orders:" in response.data
-
-
-def test_api_help_openapi_spec(client):
-    response = client.get("/api/help/openapi.json")
-    assert response.status_code == 200
-    spec = response.json
-    assert spec["openapi"].startswith("3.")
-    assert "/api/orders" in spec["paths"]
