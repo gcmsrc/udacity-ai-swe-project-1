@@ -1,0 +1,171 @@
+openapi: 3.0.3
+info:
+  title: Udatracker API
+  description: Order tracking API for the Udatracker project.
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /api/orders:
+    get:
+      summary: List orders
+      description: Return all orders, or only those matching `status`.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, processing, shipped]
+          description: Filter by order status.
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewOrder"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  message:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/orders/{order_id}:
+    get:
+      summary: Get order by ID
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  order_data:
+                    $ref: "#/components/schemas/OrderData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/orders/{order_id}/status:
+    put:
+      summary: Update order status
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [new_status]
+              properties:
+                new_status:
+                  type: string
+                  enum: [pending, processing, shipped]
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  status:
+                    type: string
+                  message:
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+components:
+  schemas:
+    OrderData:
+      type: object
+      properties:
+        item_name:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        customer_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, shipped]
+    Order:
+      allOf:
+        - type: object
+          properties:
+            order_id:
+              type: string
+        - $ref: "#/components/schemas/OrderData"
+    NewOrder:
+      type: object
+      required: [order_id, item_name, quantity, customer_id]
+      properties:
+        order_id:
+          type: string
+        item_name:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        customer_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, shipped]
+          default: pending
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

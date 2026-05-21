@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -e
+
+printf '\n'
+printf '  ╔══════════════════════════════════════════════════════════════╗\n'
+printf '  ║  Udatracker is running                                       ║\n'
+printf '  ╠══════════════════════════════════════════════════════════════╣\n'
+printf '  ║  Frontend:  http://localhost:8888                            ║\n'
+printf '  ║            (open in your browser)                            ║\n'
+printf '  ╠══════════════════════════════════════════════════════════════╣\n'
+printf '  ║  Stop:      docker compose down                            ║\n'
+printf '  ║  Logs:      docker compose logs -f udatracker              ║\n'
+printf '  ╚══════════════════════════════════════════════════════════════╝\n'
+printf '\n'
+
+exec python -m backend.app

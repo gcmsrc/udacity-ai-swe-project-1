@@ -1,0 +1,9 @@
+# Compose file for the Udatracker project
+services:
+  udatracker:
+    build: .
+    ports:
+      - "8888:8888"
+    environment:
+      PORT: "8888"
+      FLASK_DEBUG: "false"
